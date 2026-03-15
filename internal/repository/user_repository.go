@@ -2,6 +2,7 @@ package repository
 
 import (
 	"first-go-project/internal/entity"
+	"time"
 
 	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
@@ -32,4 +33,29 @@ func (r *UserRepository) FindByEmail(db *gorm.DB, user *entity.User, email strin
 		Where("email = ?", email).
 		First(user).
 		Error
+}
+
+func (r *UserRepository) FindByIdWithSickness(
+	db *gorm.DB, 
+	user *entity.User, 
+	userId string, 
+	startDate *time.Time, 
+	endDate *time.Time,
+) error {
+	query := db.
+		Where("users.id = ?", userId).
+		Preload("Sicknesses", func(tx *gorm.DB) *gorm.DB {
+			tx = tx.Joins("JOIN user_sickness ON user_sickness.sickness_id = sickness.id")
+			if (startDate != nil) && (endDate != nil) {
+				return tx.Where("user_sickness.diagnosed_at BETWEEN ? AND ?", *startDate, *endDate)
+			} else if startDate != nil {
+				return tx.Where("user_sickness.diagnosed_at >= ?", *startDate)
+			} else if endDate != nil {
+				return tx.Where("user_sickness.diagnosed_at <= ?", *endDate)
+			}
+
+			return tx
+		})
+
+	return query.First(user).Error
 }

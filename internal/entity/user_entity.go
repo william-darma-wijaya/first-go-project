@@ -14,8 +14,8 @@ type User struct {
 	CreatedAt time.Time      `gorm:"column:created_at"`
 	UpdatedAt time.Time      `gorm:"column:updated_at"`
 	DeletedAt gorm.DeletedAt `gorm:"column:deleted_at;index"`
-	
-	Addresses []Address      `gorm:"foreignKey:UserId;references:ID"`
+
+	Addresses  []Address  `gorm:"foreignKey:UserId;references:ID"`
 	Sicknesses []Sickness `gorm:"many2many:user_sickness"`
 }
 

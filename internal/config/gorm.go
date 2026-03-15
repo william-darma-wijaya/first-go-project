@@ -1,6 +1,7 @@
 package config
 
 import (
+	"first-go-project/internal/entity"
 	"fmt"
 	"time"
 
@@ -42,6 +43,7 @@ func NewDatabase(viper *viper.Viper, log *logrus.Logger) *gorm.DB {
 	if err != nil {
 		log.Fatalf("failed to connect database: %v", err)
 	}
+	db.SetupJoinTable(&entity.User{}, "Sicknesses", &entity.UserSickness{})
 
 	connection, err := db.DB()
 	if err != nil {
