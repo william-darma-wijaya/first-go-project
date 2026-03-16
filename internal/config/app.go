@@ -1,11 +1,11 @@
 package config
 
 import (
+	"first-go-project/internal/CustomValidator"
 	"first-go-project/internal/delivery/http"
 	"first-go-project/internal/delivery/http/route"
 	"first-go-project/internal/repository"
 	"first-go-project/internal/usecase"
-	"first-go-project/internal/CustomValidator"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
@@ -26,23 +26,29 @@ func Bootstrap(config *BootstrapConfig) {
 	// setup repositories
 	userRepository := repository.NewUserRepository(config.Log)
 	addressRepository := repository.NewAddressRepository(config.Log)
+	sicknessRepository := repository.NewSicknessRepository(config.Log)
+	userSicknessRepository := repository.NewUserSicknessRepository(config.Log)
 
 	// setup validators
 	userValidator := CustomValidator.NewUserValidator(config.Validate)
 	addressValidator := CustomValidator.NewAddressValidator(config.Validate)
+	sicknessValidator := CustomValidator.NewSicknessValidator(config.Validate)
 
 	// setup use cases
-	userUseCase := usecase.NewUserUseCase(config.DB, config.Log, userValidator, userRepository, addressRepository)
+	userUseCase := usecase.NewUserUseCase(config.DB, config.Log, userValidator, userRepository, addressRepository, userSicknessRepository)
 	addressUseCase := usecase.NewAddressUseCase(config.DB, config.Log, addressValidator, addressRepository)
+	sicknessUseCase := usecase.NewSicknessUsecase(config.DB, config.Log, sicknessValidator, userSicknessRepository, sicknessRepository)
 
 	// setup controller
 	userController := http.NewUserController(userUseCase, config.Log)
 	addressController := http.NewAddressController(addressUseCase, config.Log)
+	sicknessController := http.NewSicknessController(sicknessUseCase, config.Log)
 
 	routeConfig := route.RouteConfig{
-		App:               config.App,
-		UserController:    userController,
-		AddressController: addressController,
+		App:                config.App,
+		UserController:     userController,
+		AddressController:  addressController,
+		SicknessController: sicknessController,
 	}
 	routeConfig.Setup()
 }

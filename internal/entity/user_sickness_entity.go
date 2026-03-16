@@ -7,16 +7,16 @@ import (
 )
 
 type UserSickness struct {
-	ID          string         `gorm:"column:id;primaryKey"`
-	UserID      string         `gorm:"column:user_id"`
-	SicknessID  string         `gorm:"column:sickness_id"`
+	Id          string         `gorm:"column:id;primaryKey"`
+	UserId      string         `gorm:"column:user_id"`
+	SicknessId  string         `gorm:"column:sickness_id"`
 	DiagnosedAt time.Time      `gorm:"column:diagnosed_at"`
 	CreatedAt   time.Time      `gorm:"column:created_at"`
 	UpdatedAt   time.Time      `gorm:"column:updated_at"`
-	DeletedAt   gorm.DeletedAt `gorm:"column:deleted_at"`
+	DeletedAt   gorm.DeletedAt `gorm:"column:deleted_at;index"`
 
-	User     User     `gorm:"foreignKey:UserID;references:ID"`
-	Sickness Sickness `gorm:"foreignKey:SicknessID;references:ID"`
+	User     User     `gorm:"foreignKey:UserId;references:Id"`
+	Sickness Sickness `gorm:"foreignKey:SicknessId;references:Id"`
 }
 
 func (UserSickness) TableName() string {

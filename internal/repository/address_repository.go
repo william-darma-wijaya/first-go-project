@@ -23,5 +23,5 @@ func (r *AddressRepository) FindById(tx *gorm.DB, address *entity.Address, id st
 }
 
 func (r *AddressRepository) DeleteByUserId(tx *gorm.DB, user *entity.User) error {
-	return tx.Where("user_id = ?", user.ID).Delete(&entity.Address{}).Error
+	return tx.Where("user_id = ?", user.Id).Delete(&entity.Address{}).Error
 }

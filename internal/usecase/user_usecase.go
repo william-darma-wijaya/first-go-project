@@ -10,28 +10,29 @@ import (
 	"first-go-project/internal/model/converter"
 	"first-go-project/internal/repository"
 
-	// "github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
 	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
 )
 
 type UserUseCase struct {
-	DB                *gorm.DB
-	Log               *logrus.Logger
-	UserValidator     *CustomValidator.UserValidator
-	UserRepository    *repository.UserRepository
-	AddressRepository *repository.AddressRepository
+	DB                     *gorm.DB
+	Log                    *logrus.Logger
+	UserValidator          *CustomValidator.UserValidator
+	UserRepository         *repository.UserRepository
+	AddressRepository      *repository.AddressRepository
+	UserSicknessRepository *repository.UserSicknessRepository
 }
 
 func NewUserUseCase(db *gorm.DB, logger *logrus.Logger, validate *CustomValidator.UserValidator,
-	userRepository *repository.UserRepository, addressRepository *repository.AddressRepository) *UserUseCase {
+	userRepository *repository.UserRepository, addressRepository *repository.AddressRepository, userSicknessRepository *repository.UserSicknessRepository) *UserUseCase {
 	return &UserUseCase{
 		DB:                db,
 		Log:               logger,
 		UserValidator:     validate,
 		UserRepository:    userRepository,
 		AddressRepository: addressRepository,
+		UserSicknessRepository: userSicknessRepository,
 	}
 }
 
@@ -57,6 +58,7 @@ func (c *UserUseCase) Create(ctx context.Context, request *model.CreateUserReque
 		return nil, fiber.ErrInternalServerError
 	}
 
+	// dijalankan apabila terdapat error gorm.ErrRecordNotFound
 	addresses := make([]entity.Address, len(request.Addresses))
 	for i, addr := range request.Addresses {
 		addresses[i] = entity.Address{
@@ -67,7 +69,7 @@ func (c *UserUseCase) Create(ctx context.Context, request *model.CreateUserReque
 		}
 	}
 	user := &entity.User{
-		ID:        helper.GenerateULID(),
+		Id:        helper.GenerateULID(),
 		Name:      request.Name,
 		Email:     request.Email,
 		Addresses: addresses,
@@ -110,16 +112,20 @@ func (c *UserUseCase) UpdateUser(ctx context.Context, request *model.UpdateUserR
 
 	user := new(entity.User)
 	if err := c.UserRepository.FindById(tx, user, request.ID); err != nil {
-		c.Log.Warnf("Failed find user by id : %+v", err)
-		return nil, fiber.ErrNotFound
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			c.Log.Warnf("Failed find user by id: %+v", err)
+			return nil, fiber.ErrNotFound
+		}
+		c.Log.Warnf("Failed to find user by id: %+v", err)
+		return nil, fiber.ErrInternalServerError
 	}
 
-	if request.Name != "" {
-		user.Name = request.Name
+	if request.Name != nil {
+		user.Name = *request.Name
 	}
 
-	if request.Email != "" {
-		user.Email = request.Email
+	if request.Email != nil {
+		user.Email = *request.Email
 	}
 
 	if err := c.UserRepository.Update(tx, user); err != nil {
@@ -133,7 +139,7 @@ func (c *UserUseCase) UpdateUser(ctx context.Context, request *model.UpdateUserR
 	}
 
 	return &model.UpdateUserResponse{
-		ID:        user.ID,
+		ID:        user.Id,
 		Name:      user.Name,
 		Email:     user.Email,
 		UpdatedAt: user.UpdatedAt,
@@ -145,12 +151,15 @@ func (c *UserUseCase) DeleteUser(ctx context.Context, id string) (*model.DeleteU
 	defer tx.Rollback()
 
 	user := new(entity.User)
-	user.ID = id
+	user.Id = id
 	if err := c.AddressRepository.DeleteByUserId(tx, user); err != nil {
 		c.Log.Warnf("Failed to delete address : %+v", err)
 		return nil, fiber.ErrInternalServerError
 	}
-
+	if err := c.UserSicknessRepository.DeleteByUserId(tx, user); err != nil {
+		c.Log.Warnf("Failed to delete user sickness : %+v", err)
+		return nil, fiber.ErrInternalServerError
+	}
 	if err := c.UserRepository.Delete(tx, user); err != nil {
 		c.Log.Warnf("Failed to delete user : %+v", err)
 		return nil, fiber.ErrInternalServerError

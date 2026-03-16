@@ -18,8 +18,16 @@ func NewSicknessRepository(log *logrus.Logger) *SicknessRepository {
 	}
 }
 
+func (r *SicknessRepository) FindSicknessById(db *gorm.DB, sickness *entity.Sickness, id string) error {
+	return db.Where("id = ?", id).First(sickness).Error
+}
+
 func (r *SicknessRepository) FindSicknessByName(db *gorm.DB, sickness *entity.Sickness, name string) error {
 	return db.Where("name = ?", name).First(sickness).Error
+}
+
+func (r *SicknessRepository) FindSicknessesByName(db *gorm.DB, sicknesses *[]entity.Sickness, name string) error {
+	return db.Where("name ILIKE ?", "%"+name+"%").Find(sicknesses).Error
 }
 
 func (r *SicknessRepository) FindSicknessByIdWithUser(db *gorm.DB, sickness *entity.Sickness, id string) error {

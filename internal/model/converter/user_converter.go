@@ -17,7 +17,7 @@ func UserToCreateResponse(user *entity.User) *model.CreateUserResponse {
 	}
 
 	return &model.CreateUserResponse{
-		ID:        user.ID,
+		ID:        user.Id,
 		Name:      user.Name,
 		Email:     user.Email,
 		Addresses: addresses,
@@ -36,7 +36,7 @@ func UserWithAddressToResponse(user *entity.User) *model.UserWithAddressResponse
 	}
 
 	return &model.UserWithAddressResponse{
-		ID:        user.ID,
+		ID:        user.Id,
 		Name:      user.Name,
 		Email:     user.Email,
 		Addresses: addresses,

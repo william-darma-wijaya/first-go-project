@@ -8,171 +8,292 @@
   },
   "item": [
     {
-      "name": "New User",
-      "request": {
-        "method": "POST",
-        "header": [],
-        "body": {
-          "mode": "raw",
-          "raw": "{\r\n    \"name\": \"nini\",\r\n    \"email\": \"nini@gmail.com\",\r\n    \"addresses\": [\r\n        {\r\n            \"address\": \"Kuningan\",\r\n            \"city\": \"Jakarta\",\r\n            \"postal_code\": \"7834\"\r\n        },\r\n        {\r\n            \"address\": \"Kemanggisan\",\r\n            \"city\": \"Jakarta\",\r\n            \"postal_code\": \"6749\"\r\n        }\r\n    ]\r\n}",
-          "options": {
-            "raw": {
-              "language": "json"
+      "name": "Users",
+      "item": [
+        {
+          "name": "New User",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\": \"nini\",\r\n    \"email\": \"nini@gmail.com\",\r\n    \"addresses\": [\r\n        {\r\n            \"address\": \"Kuningan\",\r\n            \"city\": \"Jakarta\",\r\n            \"postal_code\": \"7834\"\r\n        },\r\n        {\r\n            \"address\": \"Kemanggisan\",\r\n            \"city\": \"Jakarta\",\r\n            \"postal_code\": \"6749\"\r\n        }\r\n    ]\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{localhost}}/api/users",
+              "host": [
+                "{{localhost}}"
+              ],
+              "path": [
+                "api",
+                "users"
+              ]
             }
-          }
+          },
+          "response": []
         },
-        "url": {
-          "raw": "{{localhost}}/api/users",
-          "host": [
-            "{{localhost}}"
-          ],
-          "path": [
-            "api",
-            "users"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Get User With Address",
-      "protocolProfileBehavior": {
-        "disableBodyPruning": true
-      },
-      "request": {
-        "method": "GET",
-        "header": [],
-        "body": {
-          "mode": "raw",
-          "raw": "{\r\n    \"name\": \"BT\",\r\n    \"email\": \"BTBelomMandi@gmail.com\",\r\n    \"addresses\": [\r\n        {\r\n            \"address\": \"Cipaganti\",\r\n            \"city\": \"Bandung\",\r\n            \"postal_code\": \"1234\"\r\n        },\r\n        {\r\n            \"address\": \"Paskal\",\r\n            \"city\": \"Bandung\",\r\n            \"postal_code\": \"2232\"\r\n        }\r\n    ]\r\n}"
+        {
+          "name": "Get User With Address",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\": \"BT\",\r\n    \"email\": \"BTBelomMandi@gmail.com\",\r\n    \"addresses\": [\r\n        {\r\n            \"address\": \"Cipaganti\",\r\n            \"city\": \"Bandung\",\r\n            \"postal_code\": \"1234\"\r\n        },\r\n        {\r\n            \"address\": \"Paskal\",\r\n            \"city\": \"Bandung\",\r\n            \"postal_code\": \"2232\"\r\n        }\r\n    ]\r\n}"
+            },
+            "url": {
+              "raw": "{{localhost}}/api/users/:id",
+              "host": [
+                "{{localhost}}"
+              ],
+              "path": [
+                "api",
+                "users",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "01KKGG92MT0D63RSCWP4MEW5J0"
+                }
+              ]
+            }
+          },
+          "response": []
         },
-        "url": {
-          "raw": "{{localhost}}/api/users/:id",
-          "host": [
-            "{{localhost}}"
-          ],
-          "path": [
-            "api",
-            "users",
-            ":id"
-          ],
-          "variable": [
-            {
-              "key": "id",
-              "value": "01KKGG92MT0D63RSCWP4MEW5J0"
+        {
+          "name": "Update User",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"id\": \"01KKGG92MT0D63RSCWP4MEW5J0\",\r\n    \"email\": \"ninini@gmail.com\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{localhost}}/api/users/update",
+              "host": [
+                "{{localhost}}"
+              ],
+              "path": [
+                "api",
+                "users",
+                "update"
+              ]
             }
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Update User",
-      "request": {
-        "method": "PATCH",
-        "header": [],
-        "body": {
-          "mode": "raw",
-          "raw": "{\r\n    \"id\": \"01KKGG92MT0D63RSCWP4MEW5J0\",\r\n    \"email\": \"ninini@gmail.com\"\r\n}",
-          "options": {
-            "raw": {
-              "language": "json"
-            }
-          }
+          },
+          "response": []
         },
-        "url": {
-          "raw": "{{localhost}}/api/users/update",
-          "host": [
-            "{{localhost}}"
-          ],
-          "path": [
-            "api",
-            "users",
-            "update"
-          ]
+        {
+          "name": "Delete User",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{localhost}}/api/users/delete/:id",
+              "host": [
+                "{{localhost}}"
+              ],
+              "path": [
+                "api",
+                "users",
+                "delete",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "01KKGG92MT0D63RSCWP4MEW5J0"
+                }
+              ]
+            }
+          },
+          "response": []
         }
-      },
-      "response": []
+      ]
     },
     {
-      "name": "Delete User",
-      "request": {
-        "method": "DELETE",
-        "header": [],
-        "url": {
-          "raw": "{{localhost}}/api/users/delete/:id",
-          "host": [
-            "{{localhost}}"
-          ],
-          "path": [
-            "api",
-            "users",
-            "delete",
-            ":id"
-          ],
-          "variable": [
-            {
-              "key": "id",
-              "value": "01KKGG92MT0D63RSCWP4MEW5J0"
+      "name": "Addresses",
+      "item": [
+        {
+          "name": "Update Address",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"id\": \"01KKGG92MT6ZD9FH98RY52914B\",\r\n    \"city\": \"Bogor\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{localhost}}/api/addresses/update",
+              "host": [
+                "{{localhost}}"
+              ],
+              "path": [
+                "api",
+                "addresses",
+                "update"
+              ]
             }
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "Update Address",
-      "request": {
-        "method": "PATCH",
-        "header": [],
-        "body": {
-          "mode": "raw",
-          "raw": "{\r\n    \"id\": \"01KKGG92MT6ZD9FH98RY52914B\",\r\n    \"city\": \"Bogor\"\r\n}",
-          "options": {
-            "raw": {
-              "language": "json"
-            }
-          }
+          },
+          "response": []
         },
-        "url": {
-          "raw": "{{localhost}}/api/addresses/update",
-          "host": [
-            "{{localhost}}"
-          ],
-          "path": [
-            "api",
-            "addresses",
-            "update"
-          ]
+        {
+          "name": "Delete Address",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{localhost}}/api/addresses/delete/:id",
+              "host": [
+                "{{localhost}}"
+              ],
+              "path": [
+                "api",
+                "addresses",
+                "delete",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "01KKGG92MT6ZD9FH98RY52914B"
+                }
+              ]
+            }
+          },
+          "response": []
         }
-      },
-      "response": []
+      ]
     },
     {
-      "name": "Delete Address",
-      "request": {
-        "method": "DELETE",
-        "header": [],
-        "url": {
-          "raw": "{{localhost}}/api/addresses/delete/:id",
-          "host": [
-            "{{localhost}}"
-          ],
-          "path": [
-            "api",
-            "addresses",
-            "delete",
-            ":id"
-          ],
-          "variable": [
-            {
-              "key": "id",
-              "value": "01KKGG92MT6ZD9FH98RY52914B"
+      "name": "Sicknesses",
+      "item": [
+        {
+          "name": "Create Sickness",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"name\": \"headache\",\r\n  \"description\": \"Headache adalah rasa nyeri atau tekanan di area kepala yang dapat muncul di dahi, pelipis, belakang kepala, atau seluruh bagian kepala. Kondisi ini bisa disebabkan oleh berbagai faktor seperti stres, kelelahan, dehidrasi, kurang tidur, atau penyakit tertentu. Gejala yang dirasakan dapat berupa nyeri ringan hingga berat dan kadang disertai dengan pusing, sensitivitas terhadap cahaya, atau mual.\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{localhost}}/api/sickness",
+              "host": [
+                "{{localhost}}"
+              ],
+              "path": [
+                "api",
+                "sickness"
+              ]
             }
-          ]
+          },
+          "response": []
+        },
+        {
+          "name": "Find Sickness By ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{localhost}}/api/sickness/:id",
+              "host": [
+                "{{localhost}}"
+              ],
+              "path": [
+                "api",
+                "sickness",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "01KKTQV24W9T1Z26TEZAGVMV54"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Sickness",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"id\": \"01KKTQXYP357BKDSBH4AV55EQG\",\r\n    \"name\": \"sakit kepala\",\r\n    \"description\": \"Headache adalah rasa nyeri atau tekanan di area kepala yang dapat muncul di dahi, pelipis, belakang kepala, atau seluruh bagian kepala. Kondisi ini bisa disebabkan oleh berbagai faktor seperti stres, kelelahan, dehidrasi, kurang tidur, atau penyakit tertentu. Gejala yang dirasakan dapat berupa nyeri ringan hingga berat dan kadang disertai dengan pusing, sensitivitas terhadap cahaya, atau mual.\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{localhost}}/api/sickness/update",
+              "host": [
+                "{{localhost}}"
+              ],
+              "path": [
+                "api",
+                "sickness",
+                "update"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Sickness",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{localhost}}/api/sickness/delete/:id",
+              "host": [
+                "{{localhost}}"
+              ],
+              "path": [
+                "api",
+                "sickness",
+                "delete",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "01KKTQXYP357BKDSBH4AV55EQG"
+                }
+              ]
+            }
+          },
+          "response": []
         }
-      },
-      "response": []
+      ]
     }
   ]
 }
