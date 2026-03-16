@@ -46,7 +46,7 @@ type SicknessResponse struct {
 	Description string `json:"description,omitempty"`
 }
 type GetSicknessesByNameRequest struct {
-	Name string `params:"name" validate:"required"`
+	Name string `query:"name" validate:"required"`
 }
 type GetSicknessesByNameResponse struct {
 	Sicknesses []SicknessResponse `json:"sicknesses"`

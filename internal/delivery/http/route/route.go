@@ -7,9 +7,9 @@ import (
 )
 
 type RouteConfig struct {
-	App               *fiber.App
-	UserController    *http.UserController
-	AddressController *http.AddressController
+	App                *fiber.App
+	UserController     *http.UserController
+	AddressController  *http.AddressController
 	SicknessController *http.SicknessController
 }
 
@@ -27,6 +27,7 @@ func (c *RouteConfig) SetupRoute() {
 	c.App.Delete("/api/addresses/delete/:id", c.AddressController.DeleteAddress)
 
 	c.App.Post("/api/sickness", c.SicknessController.CreateNewSickness)
+	c.App.Get("/api/sicknesses/getnames", c.SicknessController.FindSicknesses)
 	c.App.Get("/api/sickness/:id", c.SicknessController.GetSicknessById)
 	c.App.Patch("/api/sickness/update", c.SicknessController.UpdateSickness)
 	c.App.Delete("/api/sickness/delete/:id", c.SicknessController.DeleteSickness)

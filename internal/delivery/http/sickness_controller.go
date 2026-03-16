@@ -75,3 +75,15 @@ func (c *SicknessController) DeleteSickness(ctx *fiber.Ctx) error {
 
 	return ctx.JSON(model.WebResponse[*model.DeleteSicknessResponse]{Data: response})
 }
+
+func (c *SicknessController) FindSicknesses(ctx *fiber.Ctx) error {
+	name := ctx.Query("name")
+
+	response, err := c.UseCase.FindSicknessesByName(ctx.UserContext(), name)
+	if err != nil {
+		c.Log.Warnf("Failed to retrieve sicknesses by name: %+v", err)
+		return err
+	}
+
+	return ctx.JSON(model.WebResponse[*model.GetSicknessesByNameResponse]{Data: response})
+}

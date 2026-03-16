@@ -153,3 +153,18 @@ func (c *SicknessUsecase) DeleteSickness(ctx context.Context, id string) (*model
 
 	return &model.DeleteSicknessResponse{Message: "Sickness deleted"}, nil
 }
+
+
+func (c *SicknessUsecase) FindSicknessesByName(ctx context.Context, name string) (*model.GetSicknessesByNameResponse, error) {
+	tx := c.DB.WithContext(ctx).Begin()
+	defer tx.Rollback()
+
+	sicknesses := new([]entity.Sickness)
+	if err := c.SicknessRepository.FindSicknessesByName(tx, sicknesses, name); err != nil {
+		c.Log.Warnf("Isi hasil repository: %+v", sicknesses)
+		c.Log.Warnf("Failed to get sickness: %+v", err)
+		return nil, fiber.ErrInternalServerError
+	}
+
+	return converter.SicknessesToFindSicknessesResponse(sicknesses), nil
+}
