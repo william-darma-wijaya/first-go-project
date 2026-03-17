@@ -122,6 +122,32 @@
             }
           },
           "response": []
+        },
+        {
+          "name": "Find User By ID With Sicknesses",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{localhost}}/api/users/userwithsicknesses/:id",
+              "host": [
+                "{{localhost}}"
+              ],
+              "path": [
+                "api",
+                "users",
+                "userwithsicknesses",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "01KKX1T07HZGHA246B3DZYTJKT"
+                }
+              ]
+            }
+          },
+          "response": []
         }
       ]
     },
@@ -281,6 +307,97 @@
                 "api",
                 "sickness",
                 "delete",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "01KKTQXYP357BKDSBH4AV55EQG"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Sicknesses By Name",
+          "request": {
+            "method": "GET",
+            "header": []
+          },
+          "response": []
+        },
+        {
+          "name": "Find Sickness By Id With Users",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{localhost}}/api/sicknesswithusers/:id",
+              "host": [
+                "{{localhost}}"
+              ],
+              "path": [
+                "api",
+                "sicknesswithusers",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "01KKTQV24W9T1Z26TEZAGVMV54"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "User Sickness",
+      "item": [
+        {
+          "name": "Create New User Sickness",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"user_id\": \"01KKX1T07HZGHA246B3DZYTJKT\",\r\n    \"sickness_id\": \"01KKX27F3TYYH8W6RH3ACM2P9M\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{localhost}}/api/usersickness",
+              "host": [
+                "{{localhost}}"
+              ],
+              "path": [
+                "api",
+                "usersickness"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Count Diagnosed by Sickness Id",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{localhost}}/api/usersickness/countdiagnosed/:id",
+              "host": [
+                "{{localhost}}"
+              ],
+              "path": [
+                "api",
+                "usersickness",
+                "countdiagnosed",
                 ":id"
               ],
               "variable": [
