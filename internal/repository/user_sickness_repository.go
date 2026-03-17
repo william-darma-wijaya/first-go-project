@@ -32,8 +32,8 @@ func (r *UserSicknessRepository) FindByDiagnosedDate(
 		Find(results).Error
 }
 
-func (r *UserSicknessRepository) CountDiagnosedBySicknessId(db *gorm.DB, id string, userCount *int64) error {
-	return db.Where("sickness_id = ?", id).Count(userCount).Error
+func (r *UserSicknessRepository) CountDiagnosedBySicknessId(db *gorm.DB, id string, userCount *int64) error {	
+	return db.Model(&entity.UserSickness{}).Where("sickness_id = ?", id).Count(userCount).Error
 }
 
 func (r *UserSicknessRepository) DeleteByUserId(tx *gorm.DB, user *entity.User) error {

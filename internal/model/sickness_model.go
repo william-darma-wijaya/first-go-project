@@ -53,10 +53,13 @@ type GetSicknessesByNameResponse struct {
 }
 
 type GetSicknessByIdWithUserRequest struct {
-	Id string `params:"id" validate:"required"`
+	Id        string     `params:"id" validate:"required"`
+	StartDate *time.Time `query:"start_date"`
+	EndDate   *time.Time `query:"end_date"`
 }
 type GetSicknessByIdWithUserResponse struct {
-	Id           string         `json:"id"`
-	SicknessName string         `json:"sickness_name"`
-	Users        []UserResponse `json:"users"`
+	Id           string                        `json:"id"`
+	SicknessName string                        `json:"sickness_name"`
+	Description  string                        `json:"description"`
+	Users        []UserSicknessResponseForUser `json:"users"`
 }

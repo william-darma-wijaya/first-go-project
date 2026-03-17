@@ -161,10 +161,22 @@ func (c *SicknessUsecase) FindSicknessesByName(ctx context.Context, name string)
 
 	sicknesses := new([]entity.Sickness)
 	if err := c.SicknessRepository.FindSicknessesByName(tx, sicknesses, name); err != nil {
-		c.Log.Warnf("Isi hasil repository: %+v", sicknesses)
 		c.Log.Warnf("Failed to get sickness: %+v", err)
 		return nil, fiber.ErrInternalServerError
 	}
 
 	return converter.SicknessesToFindSicknessesResponse(sicknesses), nil
+}
+
+func (c *SicknessUsecase) FindSicknessByIdWithUser(ctx context.Context, request *model.GetSicknessByIdWithUserRequest) (*model.GetSicknessByIdWithUserResponse, error) {
+	tx := c.DB.WithContext(ctx).Begin()
+	defer tx.Rollback()
+
+	sickness := new(entity.Sickness)
+	if err := c.SicknessRepository.FindSicknessByIdWithUser(tx, sickness, request.Id, request.StartDate, request.EndDate); err != nil {
+		c.Log.Warnf("Failed to get sickness by ID with users: %+v", err)
+		return nil, fiber.ErrInternalServerError
+	}
+
+	return converter.SicknessToSicknessWithUsersResponse(sickness), nil
 }

@@ -42,3 +42,26 @@ func UserWithAddressToResponse(user *entity.User) *model.UserWithAddressResponse
 		Addresses: addresses,
 	}
 }
+
+func UserToUserWithSicknessesResponse(user *entity.User) *model.GetUserByIdWithSicknessResponse {
+	response := &model.GetUserByIdWithSicknessResponse{
+		Id: user.Id,
+		Name: user.Name,
+		Email: user.Email,
+	}
+
+	sicknesses := make([]model.UserSicknessResponseForSickness, 0)
+	for _, userSickness := range user.Sicknesses {
+		sick := model.UserSicknessResponseForSickness{
+			Id: userSickness.Id,
+			Name: userSickness.Sickness.Name,
+			Description: userSickness.Sickness.Description,
+			DiagnosedAt: userSickness.DiagnosedAt,
+		}
+		sicknesses = append(sicknesses, sick)
+	}
+
+	response.Sicknesses = sicknesses
+
+	return response
+}

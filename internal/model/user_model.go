@@ -55,14 +55,12 @@ type DeleteUserResponse struct {
 
 type GetUserByIdWithSicknessRequest struct {
 	Id        string    `params:"id"`
-	StartDate time.Time `query:"start_date"`
-	EndDate   time.Time `query:"end_date"`
+	StartDate *time.Time `query:"start_date"`
+	EndDate   *time.Time `query:"end_date"`
 }
 type GetUserByIdWithSicknessResponse struct {
 	Id string `json:"id"`
 	Name string `json:"user_name"`
 	Email string `json:"email"`
-	StartDate time.Time `json:"start_date"`
-	EndDate time.Time `json:"end_date"`
-	Sicknesses []UserSicknessResponse `json:"sicknesses"`
+	Sicknesses []UserSicknessResponseForSickness `json:"sicknesses"`
 }

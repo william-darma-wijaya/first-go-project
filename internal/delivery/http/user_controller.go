@@ -79,3 +79,25 @@ func (c * UserController) DeleteUser(ctx *fiber.Ctx) error {
 
 	return ctx.JSON(model.WebResponse[*model.DeleteUserResponse]{Data: response})
 }
+
+func (c *UserController) FindUserByIdWithSicknesses(ctx *fiber.Ctx) error {
+	req := new(model.GetUserByIdWithSicknessRequest)
+	
+	if err := ctx.ParamsParser(req); err != nil {
+		c.Log.Warnf("Failed to parse params: %+v", err)
+		return fiber.ErrBadRequest
+	}
+
+	if err := ctx.QueryParser(req); err != nil {
+		c.Log.Warnf("Failed to parse query: %+v", err)
+		return fiber.ErrBadRequest
+	}
+
+	response, err := c.UseCase.FindUserByIdWithSicknesses(ctx.UserContext(), req)
+	if err != nil {
+		c.Log.Warnf("Failed to retrieve user by ID with sicknesses: %+v", err)
+		return err
+	}
+
+	return ctx.JSON(model.WebResponse[*model.GetUserByIdWithSicknessResponse]{Data: response})
+}

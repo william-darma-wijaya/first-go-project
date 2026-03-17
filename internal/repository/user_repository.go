@@ -45,17 +45,15 @@ func (r *UserRepository) FindByIdWithSickness(
 	query := db.
 		Where("users.id = ?", userId).
 		Preload("Sicknesses", func(tx *gorm.DB) *gorm.DB {
-			tx = tx.Joins("JOIN user_sickness ON user_sickness.sickness_id = sickness.id")
 			if (startDate != nil) && (endDate != nil) {
-				return tx.Where("user_sickness.diagnosed_at BETWEEN ? AND ?", *startDate, *endDate)
+				return tx.Where("diagnosed_at BETWEEN ? AND ?", *startDate, *endDate)
 			} else if startDate != nil {
-				return tx.Where("user_sickness.diagnosed_at >= ?", *startDate)
+				return tx.Where("diagnosed_at >= ?", *startDate)
 			} else if endDate != nil {
-				return tx.Where("user_sickness.diagnosed_at <= ?", *endDate)
+				return tx.Where("diagnosed_at <= ?", *endDate)
 			}
-
 			return tx
-		})
+		}).Preload("Sicknesses.Sickness")
 
 	return query.First(user).Error
 }

@@ -45,3 +45,26 @@ func SicknessesToFindSicknessesResponse(sicknesses *[]entity.Sickness) (*model.G
 		Sicknesses: responses,
 	}
 }
+
+func SicknessToSicknessWithUsersResponse(sickness *entity.Sickness) (*model.GetSicknessByIdWithUserResponse) {
+	response := &model.GetSicknessByIdWithUserResponse{
+		Id: sickness.Id,
+		SicknessName: sickness.Name,
+		Description: sickness.Description,
+	}
+
+	users := make([]model.UserSicknessResponseForUser, 0)
+	for _, userSickness := range sickness.Users {
+		s := model.UserSicknessResponseForUser{
+			Id: userSickness.User.Id,
+			Name: userSickness.User.Name,
+			Email: userSickness.User.Email,
+			DiagnosedAt: userSickness.DiagnosedAt,
+		}
+		users = append(users, s)
+	}
+
+	response.Users = users
+
+	return response
+}

@@ -87,3 +87,26 @@ func (c *SicknessController) FindSicknesses(ctx *fiber.Ctx) error {
 
 	return ctx.JSON(model.WebResponse[*model.GetSicknessesByNameResponse]{Data: response})
 }
+
+
+func (c *SicknessController) FindSicknessByIdWithUser(ctx *fiber.Ctx) error {
+	req := new(model.GetSicknessByIdWithUserRequest)
+
+	if err := ctx.ParamsParser(req); err != nil {
+		c.Log.Warnf("Failed to parse params: %+v", err)
+		return fiber.ErrBadRequest
+	}
+
+	if err := ctx.QueryParser(req); err != nil {
+		c.Log.Warnf("Failed to parse query: %+v", err)
+		return fiber.ErrBadRequest
+	}
+
+	response, err := c.UseCase.FindSicknessByIdWithUser(ctx.UserContext(), req)
+	if err != nil {
+		c.Log.Warnf("Failed to query sickness by ID with users: %+v", err)
+		return err
+	}
+
+	return ctx.JSON(model.WebResponse[*model.GetSicknessByIdWithUserResponse]{Data: response})
+}

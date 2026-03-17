@@ -27,11 +27,11 @@ type UserUseCase struct {
 func NewUserUseCase(db *gorm.DB, logger *logrus.Logger, validate *CustomValidator.UserValidator,
 	userRepository *repository.UserRepository, addressRepository *repository.AddressRepository, userSicknessRepository *repository.UserSicknessRepository) *UserUseCase {
 	return &UserUseCase{
-		DB:                db,
-		Log:               logger,
-		UserValidator:     validate,
-		UserRepository:    userRepository,
-		AddressRepository: addressRepository,
+		DB:                     db,
+		Log:                    logger,
+		UserValidator:          validate,
+		UserRepository:         userRepository,
+		AddressRepository:      addressRepository,
 		UserSicknessRepository: userSicknessRepository,
 	}
 }
@@ -171,4 +171,17 @@ func (c *UserUseCase) DeleteUser(ctx context.Context, id string) (*model.DeleteU
 	}
 
 	return &model.DeleteUserResponse{Message: "User deleted"}, nil
+}
+
+func (c *UserUseCase) FindUserByIdWithSicknesses(ctx context.Context, req *model.GetUserByIdWithSicknessRequest) (*model.GetUserByIdWithSicknessResponse, error) {
+	tx := c.DB.WithContext(ctx).Begin()
+	defer tx.Rollback()
+
+	user := new(entity.User)
+	if err := c.UserRepository.FindByIdWithSickness(tx, user, req.Id, req.StartDate, req.EndDate); err != nil {
+		c.Log.Warnf("Failed to get User by ID with sicknesses: %+v", err)
+		return nil, fiber.ErrInternalServerError
+	}
+
+	return converter.UserToUserWithSicknessesResponse(user), nil
 }
