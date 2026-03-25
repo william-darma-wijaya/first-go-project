@@ -1,8 +1,9 @@
 package main
 
 import (
-	"fmt"
 	"first-go-project/internal/config"
+	"first-go-project/internal/entity"
+	"fmt"
 )
 
 func main() {
@@ -10,6 +11,10 @@ func main() {
 	log := config.NewLogger(viperConfig)
 	db := config.NewDatabase(viperConfig, log)
 	validate := config.NewValidator(viperConfig)
+	authConfig := &entity.AuthConfig{
+		Secret: viperConfig.GetString("jwt.secret"),
+		MinutesExp: viperConfig.GetInt("jwt.minutes_exp"),
+	}
 	app := config.NewFiber(viperConfig)
 
 	config.Bootstrap(&config.BootstrapConfig{
@@ -18,6 +23,7 @@ func main() {
 		Log:      log,
 		Validate: validate,
 		Config:   viperConfig,
+		AuthConfig: authConfig,
 	})
 
 	webPort := viperConfig.GetInt("web.port")

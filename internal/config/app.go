@@ -3,7 +3,9 @@ package config
 import (
 	"first-go-project/internal/CustomValidator"
 	"first-go-project/internal/delivery/http"
+	"first-go-project/internal/delivery/http/middleware"
 	"first-go-project/internal/delivery/http/route"
+	"first-go-project/internal/entity"
 	"first-go-project/internal/repository"
 	"first-go-project/internal/usecase"
 
@@ -15,11 +17,12 @@ import (
 )
 
 type BootstrapConfig struct {
-	DB       *gorm.DB
-	App      *fiber.App
-	Log      *logrus.Logger
-	Validate *validator.Validate
-	Config   *viper.Viper
+	DB         *gorm.DB
+	App        *fiber.App
+	Log        *logrus.Logger
+	Validate   *validator.Validate
+	Config     *viper.Viper
+	AuthConfig *entity.AuthConfig
 }
 
 func Bootstrap(config *BootstrapConfig) {
@@ -36,7 +39,7 @@ func Bootstrap(config *BootstrapConfig) {
 	userSicknessValidator := CustomValidator.NewUserSicknessValidator(config.Validate)
 
 	// setup use cases
-	userUseCase := usecase.NewUserUseCase(config.DB, config.Log, userValidator, userRepository, addressRepository, userSicknessRepository)
+	userUseCase := usecase.NewUserUseCase(config.DB, config.Log, userValidator, config.AuthConfig, userRepository, addressRepository, userSicknessRepository)
 	addressUseCase := usecase.NewAddressUseCase(config.DB, config.Log, addressValidator, addressRepository)
 	sicknessUseCase := usecase.NewSicknessUsecase(config.DB, config.Log, sicknessValidator, userSicknessRepository, sicknessRepository)
 	userSicknessUseCase := usecase.NewUserSicknessUsecase(config.DB, config.Log, userSicknessValidator, userSicknessRepository, sicknessRepository)
@@ -47,12 +50,15 @@ func Bootstrap(config *BootstrapConfig) {
 	sicknessController := http.NewSicknessController(sicknessUseCase, config.Log)
 	userSicknessController := http.NewUserSicknessController(userSicknessUseCase, config.Log)
 
+	authMiddleware := middleware.NewAuth(userUseCase)
+
 	routeConfig := route.RouteConfig{
-		App:                config.App,
-		UserController:     userController,
-		AddressController:  addressController,
-		SicknessController: sicknessController,
+		App:                    config.App,
+		UserController:         userController,
+		AddressController:      addressController,
+		SicknessController:     sicknessController,
 		UserSicknessController: userSicknessController,
+		AuthMiddleware: authMiddleware,
 	}
 	routeConfig.Setup()
 }

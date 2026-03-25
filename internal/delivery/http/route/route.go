@@ -12,14 +12,21 @@ type RouteConfig struct {
 	AddressController      *http.AddressController
 	SicknessController     *http.SicknessController
 	UserSicknessController *http.UserSicknessController
+	AuthMiddleware         fiber.Handler
 }
 
 func (c *RouteConfig) Setup() {
-	c.SetupRoute()
+	c.SetupGuestRoute()
+	c.SetupAuthRoute()
 }
 
-func (c *RouteConfig) SetupRoute() {
+func (c *RouteConfig) SetupGuestRoute() {
 	c.App.Post("/api/users", c.UserController.Register)
+	c.App.Post("/api/users/login", c.UserController.Login)
+}
+
+func (c *RouteConfig) SetupAuthRoute() {
+	c.App.Use(c.AuthMiddleware)
 	c.App.Patch("/api/users/update", c.UserController.UpdateUser)
 	c.App.Get("/api/users/userwithsicknesses/:id", c.UserController.FindUserByIdWithSicknesses)
 	c.App.Get("/api/users/:id", c.UserController.GetUserWithAddress)

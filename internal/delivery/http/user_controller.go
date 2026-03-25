@@ -37,6 +37,22 @@ func (c *UserController) Register(ctx *fiber.Ctx) error {
 	return ctx.JSON(model.WebResponse[*model.CreateUserResponse]{Data: response})
 }
 
+func (c *UserController) Login(ctx *fiber.Ctx) error {
+	request := &model.UserLoginRequest{}
+	if err := ctx.BodyParser(request); err != nil {
+		c.Log.Warnf("Failed to parse request body: %+v", err)
+		return fiber.ErrBadRequest
+	}
+
+	response, err := c.UseCase.Login(ctx.UserContext(), request)
+	if err != nil {
+		c.Log.Warnf("Failed to login user: %+v", err)
+		return err
+	}
+
+	return ctx.JSON(model.WebResponse[*model.UserLoginResponse]{Data: response})
+}
+
 func (c *UserController) GetUserWithAddress(ctx *fiber.Ctx) error {
 
 	idStr := ctx.Params("id")

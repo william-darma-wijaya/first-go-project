@@ -20,5 +20,9 @@
       "max": 100,
       "lifetime": 300
     }
+  },
+  "jwt": {
+    "secret": "adminadmin123!",
+    "minutes_exp": 1440
   }
 }

@@ -4,6 +4,10 @@ import (
 	"context"
 	"errors"
 	"first-go-project/internal/CustomValidator"
+
+	// "first-go-project/internal/config"
+
+	// "first-go-project/internal/config"
 	"first-go-project/internal/entity"
 	"first-go-project/internal/helper"
 	"first-go-project/internal/model"
@@ -11,6 +15,7 @@ import (
 	"first-go-project/internal/repository"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
 )
@@ -22,9 +27,10 @@ type UserUseCase struct {
 	UserRepository         *repository.UserRepository
 	AddressRepository      *repository.AddressRepository
 	UserSicknessRepository *repository.UserSicknessRepository
+	AuthConfig *entity.AuthConfig
 }
 
-func NewUserUseCase(db *gorm.DB, logger *logrus.Logger, validate *CustomValidator.UserValidator,
+func NewUserUseCase(db *gorm.DB, logger *logrus.Logger, validate *CustomValidator.UserValidator, authConfig *entity.AuthConfig,
 	userRepository *repository.UserRepository, addressRepository *repository.AddressRepository, userSicknessRepository *repository.UserSicknessRepository) *UserUseCase {
 	return &UserUseCase{
 		DB:                     db,
@@ -33,6 +39,7 @@ func NewUserUseCase(db *gorm.DB, logger *logrus.Logger, validate *CustomValidato
 		UserRepository:         userRepository,
 		AddressRepository:      addressRepository,
 		UserSicknessRepository: userSicknessRepository,
+		AuthConfig: authConfig,
 	}
 }
 
@@ -68,9 +75,16 @@ func (c *UserUseCase) Create(ctx context.Context, request *model.CreateUserReque
 			PostalCode: addr.PostalCode,
 		}
 	}
+
+	hashedPass, err := helper.HashPassword(request.Password)
+	if err != nil {
+		return nil, fiber.ErrInternalServerError
+	}
+
 	user := &entity.User{
 		Id:        helper.GenerateULID(),
 		Name:      request.Name,
+		Password:  hashedPass,
 		Email:     request.Email,
 		Addresses: addresses,
 	}
@@ -86,6 +100,61 @@ func (c *UserUseCase) Create(ctx context.Context, request *model.CreateUserReque
 	}
 
 	return converter.UserToCreateResponse(user), nil
+}
+
+func (c *UserUseCase) Login(ctx context.Context, request *model.UserLoginRequest) (*model.UserLoginResponse, error) {
+
+	user := &entity.User{}
+	err := c.UserRepository.FindByEmail(c.DB.WithContext(ctx), user, request.Email)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			c.Log.Warnf("User email not found : %+v", err)
+		}
+		c.Log.Errorf("Error from database to retrieve user: %+v", err)
+		return nil, fiber.ErrInternalServerError
+	}
+
+	if matchPass := helper.ComparePassAndHashed(request.Password, user.Password); matchPass != true {
+		c.Log.Warn("Wrong password")
+		return nil, fiber.ErrUnauthorized
+	}
+
+	token, err := helper.GenerateJWT(c.AuthConfig, user.Id)
+	if err != nil {
+		c.Log.Warnf("Error generating JWT token: %+v", err)
+		return nil, fiber.ErrInternalServerError
+	}
+
+	return &model.UserLoginResponse{Token: token}, nil
+}
+
+func (c *UserUseCase) Verify(ctx context.Context, request *model.VerifyUserRequest) (*model.Auth, error) {
+
+	token, err := jwt.Parse(request.Token, func(t *jwt.Token) (interface{}, error) {
+		return []byte(c.AuthConfig.Secret), nil
+	})
+
+	if err != nil || !token.Valid {
+		return nil, fiber.ErrUnauthorized
+	}
+
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if !ok {
+		return nil, fiber.ErrUnauthorized
+	}
+
+	userID, ok := claims["user_id"].(string)
+	if !ok {
+		return nil, fiber.ErrUnauthorized
+	}
+
+	user := new(entity.User)
+	err = c.UserRepository.FindById(c.DB.WithContext(ctx), user, userID)
+	if err != nil {
+		return nil, fiber.ErrUnauthorized
+	}
+
+	return &model.Auth{ID: user.Id}, nil
 }
 
 func (c *UserUseCase) GetUserAndAddress(ctx context.Context, id string) (*model.UserWithAddressResponse, error) {
