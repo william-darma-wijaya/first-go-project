@@ -28,6 +28,10 @@ type UserLoginResponse struct {
 	Token string `json:"token"`
 }
 
+type UserLogoutResponse struct {
+	Message string `json:"message"`
+}
+
 type GetUserRequest struct {
 	ID string `params:"id" validate:"required"`
 }

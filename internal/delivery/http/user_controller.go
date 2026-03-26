@@ -3,6 +3,7 @@ package http
 import (
 	"first-go-project/internal/model"
 	"first-go-project/internal/usecase"
+	"strings"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/sirupsen/logrus"
@@ -51,6 +52,24 @@ func (c *UserController) Login(ctx *fiber.Ctx) error {
 	}
 
 	return ctx.JSON(model.WebResponse[*model.UserLoginResponse]{Data: response})
+}
+
+func (c *UserController) Logout(ctx *fiber.Ctx) error {
+	authHandler := ctx.Get("Authorization")
+
+	if authHandler == "" {
+		return fiber.ErrUnauthorized
+	}
+
+	token := strings.TrimPrefix(authHandler, "Bearer ")
+
+	resp, err := c.UseCase.Logout(ctx.UserContext(), token)
+	if err != nil {
+		c.Log.Warnf("Failed to logout user: %+v", err)
+		return err
+	}
+
+	return ctx.JSON(model.WebResponse[*model.UserLogoutResponse]{Data: resp})
 }
 
 func (c *UserController) GetUserWithAddress(ctx *fiber.Ctx) error {
