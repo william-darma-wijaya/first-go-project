@@ -28,8 +28,9 @@ func (c *RouteConfig) SetupGuestRoute() {
 func (c *RouteConfig) SetupAuthRoute() {
 	c.App.Use(c.AuthMiddleware)
 	c.App.Patch("/api/users/update", c.UserController.UpdateUser)
+	c.App.Post("/api/users/logout", c.UserController.Logout)
 	c.App.Get("/api/users/userwithsicknesses/:id", c.UserController.FindUserByIdWithSicknesses)
-	c.App.Get("/api/users/:id", c.UserController.GetUserWithAddress)
+	c.App.Get("/api/users/userwithaddresses:id", c.UserController.GetUserWithAddress)
 	c.App.Delete("/api/users/delete/:id", c.UserController.DeleteUser)
 
 	c.App.Patch("/api/addresses/update", c.AddressController.UpdateAddress)

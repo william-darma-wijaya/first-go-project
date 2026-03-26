@@ -8,13 +8,14 @@ import (
 	"first-go-project/internal/entity"
 	"first-go-project/internal/repository"
 	"first-go-project/internal/usecase"
+	"first-go-project/internal/gateway/caching"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
-	"github.com/redis/go-redis/v9"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"gorm.io/gorm"
+	"github.com/redis/go-redis/v9"
 )
 
 type BootstrapConfig struct {
@@ -34,6 +35,9 @@ func Bootstrap(config *BootstrapConfig) {
 	sicknessRepository := repository.NewSicknessRepository(config.Log)
 	userSicknessRepository := repository.NewUserSicknessRepository(config.Log)
 
+	// setup caches
+	userCache := caching.NewUserCache(config.RedisClient)
+
 	// setup validators
 	userValidator := CustomValidator.NewUserValidator(config.Validate)
 	addressValidator := CustomValidator.NewAddressValidator(config.Validate)
@@ -41,7 +45,7 @@ func Bootstrap(config *BootstrapConfig) {
 	userSicknessValidator := CustomValidator.NewUserSicknessValidator(config.Validate)
 
 	// setup use cases
-	userUseCase := usecase.NewUserUseCase(config.DB, config.Log, userValidator, config.AuthConfig, userRepository, addressRepository, userSicknessRepository)
+	userUseCase := usecase.NewUserUseCase(config.DB, config.Log, userValidator, config.AuthConfig, userRepository, addressRepository, userCache, userSicknessRepository)
 	addressUseCase := usecase.NewAddressUseCase(config.DB, config.Log, addressValidator, addressRepository)
 	sicknessUseCase := usecase.NewSicknessUsecase(config.DB, config.Log, sicknessValidator, userSicknessRepository, sicknessRepository)
 	userSicknessUseCase := usecase.NewUserSicknessUsecase(config.DB, config.Log, userSicknessValidator, userSicknessRepository, sicknessRepository)

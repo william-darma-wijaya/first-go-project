@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"first-go-project/internal/CustomValidator"
+	"first-go-project/internal/gateway/caching"
 
 	// "first-go-project/internal/config"
 
@@ -27,11 +28,12 @@ type UserUseCase struct {
 	UserRepository         *repository.UserRepository
 	AddressRepository      *repository.AddressRepository
 	UserSicknessRepository *repository.UserSicknessRepository
-	AuthConfig *entity.AuthConfig
+	AuthConfig             *entity.AuthConfig
+	UserCache              *caching.UserCache
 }
 
 func NewUserUseCase(db *gorm.DB, logger *logrus.Logger, validate *CustomValidator.UserValidator, authConfig *entity.AuthConfig,
-	userRepository *repository.UserRepository, addressRepository *repository.AddressRepository, userSicknessRepository *repository.UserSicknessRepository) *UserUseCase {
+	userRepository *repository.UserRepository, addressRepository *repository.AddressRepository, userCache *caching.UserCache, userSicknessRepository *repository.UserSicknessRepository) *UserUseCase {
 	return &UserUseCase{
 		DB:                     db,
 		Log:                    logger,
@@ -39,7 +41,8 @@ func NewUserUseCase(db *gorm.DB, logger *logrus.Logger, validate *CustomValidato
 		UserRepository:         userRepository,
 		AddressRepository:      addressRepository,
 		UserSicknessRepository: userSicknessRepository,
-		AuthConfig: authConfig,
+		AuthConfig:             authConfig,
+		UserCache:              userCache,
 	}
 }
 
@@ -125,12 +128,18 @@ func (c *UserUseCase) Login(ctx context.Context, request *model.UserLoginRequest
 		return nil, fiber.ErrInternalServerError
 	}
 
+	// simpan user_id ke redis
+	err = c.UserCache.Set(ctx, token, user.Id, c.AuthConfig.MinutesExp)
+	if err != nil {
+		return nil, fiber.ErrInternalServerError
+	}
+
 	return &model.UserLoginResponse{Token: token}, nil
 }
 
 func (c *UserUseCase) Verify(ctx context.Context, request *model.VerifyUserRequest) (*model.Auth, error) {
 
-	token, err := jwt.Parse(request.Token, func(t *jwt.Token) (interface{}, error) {
+	token, err := jwt.Parse(request.Token, func(t *jwt.Token) (any, error) {
 		return []byte(c.AuthConfig.Secret), nil
 	})
 
@@ -138,23 +147,21 @@ func (c *UserUseCase) Verify(ctx context.Context, request *model.VerifyUserReque
 		return nil, fiber.ErrUnauthorized
 	}
 
-	claims, ok := token.Claims.(jwt.MapClaims)
-	if !ok {
-		return nil, fiber.ErrUnauthorized
-	}
-
-	userID, ok := claims["user_id"].(string)
-	if !ok {
-		return nil, fiber.ErrUnauthorized
-	}
-
-	user := new(entity.User)
-	err = c.UserRepository.FindById(c.DB.WithContext(ctx), user, userID)
+	userId, err := c.UserCache.Get(ctx, request.Token)
 	if err != nil {
 		return nil, fiber.ErrUnauthorized
 	}
 
-	return &model.Auth{ID: user.Id}, nil
+	return &model.Auth{ID: userId}, nil
+}
+
+func (c *UserUseCase) Logout(ctx context.Context, token string) (*model.UserLogoutResponse, error) {
+	if err := c.UserCache.Delete(ctx, token); err != nil {
+		c.Log.Warnf("Failed to delete token from cache: %+v", err)
+		return nil, fiber.ErrInternalServerError
+	}
+
+	return &model.UserLogoutResponse{Message: "User Logged Out"}, nil
 }
 
 func (c *UserUseCase) GetUserAndAddress(ctx context.Context, id string) (*model.UserWithAddressResponse, error) {
