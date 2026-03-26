@@ -7,9 +7,11 @@ import (
 )
 
 func main() {
-	viperConfig := config.NewViper()
+	viperConfig := config.NewConfigViper()
+	viperSecret := config.NewSecretViper()
 	log := config.NewLogger(viperConfig)
 	db := config.NewDatabase(viperConfig, log)
+	redis := config.NewRedisClient(viperSecret)
 	validate := config.NewValidator(viperConfig)
 	authConfig := &entity.AuthConfig{
 		Secret: viperConfig.GetString("jwt.secret"),
@@ -24,6 +26,7 @@ func main() {
 		Validate: validate,
 		Config:   viperConfig,
 		AuthConfig: authConfig,
+		RedisClient: redis,
 	})
 
 	webPort := viperConfig.GetInt("web.port")
