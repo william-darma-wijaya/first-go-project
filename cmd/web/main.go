@@ -14,19 +14,21 @@ func main() {
 	redis := config.NewRedisClient(viperSecret)
 	validate := config.NewValidator(viperConfig)
 	authConfig := &entity.AuthConfig{
-		Secret: viperConfig.GetString("jwt.secret"),
+		Secret:     viperConfig.GetString("jwt.secret"),
 		MinutesExp: viperConfig.GetInt("jwt.minutes_exp"),
 	}
+	kafka := config.NewKafkaProducer(viperSecret, log)
 	app := config.NewFiber(viperConfig)
 
 	config.Bootstrap(&config.BootstrapConfig{
-		DB:       db,
-		App:      app,
-		Log:      log,
-		Validate: validate,
-		Config:   viperConfig,
-		AuthConfig: authConfig,
-		RedisClient: redis,
+		DB:            db,
+		App:           app,
+		Log:           log,
+		Validate:      validate,
+		Config:        viperConfig,
+		AuthConfig:    authConfig,
+		RedisClient:   redis,
+		KafkaProducer: kafka,
 	})
 
 	webPort := viperConfig.GetInt("web.port")

@@ -5,6 +5,7 @@ import (
 	"errors"
 	"first-go-project/internal/CustomValidator"
 	"first-go-project/internal/gateway/caching"
+	"first-go-project/internal/gateway/messaging"
 
 	// "first-go-project/internal/config"
 
@@ -30,10 +31,12 @@ type UserUseCase struct {
 	UserSicknessRepository *repository.UserSicknessRepository
 	AuthConfig             *entity.AuthConfig
 	UserCache              *caching.UserCache
+	UserProducer           *messaging.UserProducer
 }
 
 func NewUserUseCase(db *gorm.DB, logger *logrus.Logger, validate *CustomValidator.UserValidator, authConfig *entity.AuthConfig,
-	userRepository *repository.UserRepository, addressRepository *repository.AddressRepository, userCache *caching.UserCache, userSicknessRepository *repository.UserSicknessRepository) *UserUseCase {
+	userRepository *repository.UserRepository, addressRepository *repository.AddressRepository, userCache *caching.UserCache, 
+	userSicknessRepository *repository.UserSicknessRepository, userProducer *messaging.UserProducer) *UserUseCase {
 	return &UserUseCase{
 		DB:                     db,
 		Log:                    logger,
@@ -43,6 +46,7 @@ func NewUserUseCase(db *gorm.DB, logger *logrus.Logger, validate *CustomValidato
 		UserSicknessRepository: userSicknessRepository,
 		AuthConfig:             authConfig,
 		UserCache:              userCache,
+		UserProducer: userProducer,
 	}
 }
 
