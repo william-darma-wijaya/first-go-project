@@ -25,7 +25,8 @@ type UserLoginRequest struct {
 	Password string `json:"password"`
 }
 type UserLoginResponse struct {
-	Token string `json:"token"`
+	Token        string `json:"token"`
+	RefreshToken string `json:"refresh_token"`
 }
 
 type UserLogoutResponse struct {

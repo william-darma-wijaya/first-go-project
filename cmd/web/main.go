@@ -16,6 +16,7 @@ func main() {
 	authConfig := &entity.AuthConfig{
 		Secret:     viperConfig.GetString("jwt.secret"),
 		MinutesExp: viperConfig.GetInt("jwt.minutes_exp"),
+		RefreshMinutesExp: viperConfig.GetInt("jwt.refresh_minutes_exp"),
 	}
 	kafka := config.NewKafkaProducer(viperSecret, log)
 	app := config.NewFiber(viperConfig)

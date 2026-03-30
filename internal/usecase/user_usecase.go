@@ -35,7 +35,7 @@ type UserUseCase struct {
 }
 
 func NewUserUseCase(db *gorm.DB, logger *logrus.Logger, validate *CustomValidator.UserValidator, authConfig *entity.AuthConfig,
-	userRepository *repository.UserRepository, addressRepository *repository.AddressRepository, userCache *caching.UserCache, 
+	userRepository *repository.UserRepository, addressRepository *repository.AddressRepository, userCache *caching.UserCache,
 	userSicknessRepository *repository.UserSicknessRepository, userProducer *messaging.UserProducer) *UserUseCase {
 	return &UserUseCase{
 		DB:                     db,
@@ -46,7 +46,7 @@ func NewUserUseCase(db *gorm.DB, logger *logrus.Logger, validate *CustomValidato
 		UserSicknessRepository: userSicknessRepository,
 		AuthConfig:             authConfig,
 		UserCache:              userCache,
-		UserProducer: userProducer,
+		UserProducer:           userProducer,
 	}
 }
 
@@ -126,7 +126,7 @@ func (c *UserUseCase) Login(ctx context.Context, request *model.UserLoginRequest
 		return nil, fiber.ErrUnauthorized
 	}
 
-	token, err := helper.GenerateJWT(c.AuthConfig, user.Id)
+	token, refreshToken, err := helper.GenerateJWT(c.AuthConfig, user.Id)
 	if err != nil {
 		c.Log.Warnf("Error generating JWT token: %+v", err)
 		return nil, fiber.ErrInternalServerError
@@ -138,7 +138,7 @@ func (c *UserUseCase) Login(ctx context.Context, request *model.UserLoginRequest
 		return nil, fiber.ErrInternalServerError
 	}
 
-	return &model.UserLoginResponse{Token: token}, nil
+	return &model.UserLoginResponse{Token: token, RefreshToken: refreshToken}, nil
 }
 
 func (c *UserUseCase) Verify(ctx context.Context, request *model.VerifyUserRequest) (*model.Auth, error) {

@@ -23,6 +23,7 @@
   },
   "jwt": {
     "secret": "adminadmin123!",
-    "minutes_exp": 1440
+    "minutes_exp": 1440,
+    "refresh_minutes_exp": 2880
   }
 }
