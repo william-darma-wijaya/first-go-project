@@ -72,6 +72,22 @@ func (c *UserController) Logout(ctx *fiber.Ctx) error {
 	return ctx.JSON(model.WebResponse[*model.UserLogoutResponse]{Data: resp})
 }
 
+func (c *UserController) RefreshToken(ctx *fiber.Ctx) error {
+	request := &model.RefreshTokenRequest{}
+	if err := ctx.BodyParser(request); err != nil {
+		c.Log.Warnf("Failed to parse request body: %+v", err)
+		return fiber.ErrBadRequest
+	}
+
+	response, err := c.UseCase.RefreshJWTToken(ctx.UserContext(), request)
+	if err != nil {
+		c.Log.Warnf("Failed to refresh JWT token: %+v", err)
+		return err
+	}
+
+	return ctx.JSON(model.WebResponse[*model.RefreshTokenResponse]{Data: response})
+}
+
 func (c *UserController) GetUserWithAddress(ctx *fiber.Ctx) error {
 
 	idStr := ctx.Params("id")

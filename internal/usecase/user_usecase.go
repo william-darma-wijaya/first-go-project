@@ -168,6 +168,40 @@ func (c *UserUseCase) Logout(ctx context.Context, token string) (*model.UserLogo
 	return &model.UserLogoutResponse{Message: "User Logged Out"}, nil
 }
 
+func (c *UserUseCase) RefreshJWTToken(ctx context.Context, request *model.RefreshTokenRequest) (*model.RefreshTokenResponse, error) {
+	refreshToken, err := jwt.Parse(request.RefreshToken, func(t *jwt.Token) (any, error) {
+		return []byte(c.AuthConfig.Secret), nil
+	})
+
+	if err != nil || !refreshToken.Valid {
+		return nil, fiber.ErrUnauthorized
+	}
+
+	claims, ok := refreshToken.Claims.(jwt.MapClaims)
+	if !ok {
+		return nil, fiber.ErrUnauthorized
+	}
+
+	userID, ok := claims["user_id"].(string)
+	if !ok {
+		return nil, fiber.ErrUnauthorized
+	}
+
+	token, newRefreshToken, err := helper.GenerateJWT(c.AuthConfig, userID)
+	if err != nil {
+		c.Log.Warnf("Error generating JWT token: %+v", err)
+		return nil, fiber.ErrInternalServerError
+	}
+
+	// simpan user_id ke redis
+	err = c.UserCache.Set(ctx, token, userID, c.AuthConfig.MinutesExp)
+	if err != nil {
+		return nil, fiber.ErrInternalServerError
+	}
+
+	return &model.RefreshTokenResponse{Token: token, RefreshToken: newRefreshToken}, nil
+}
+
 func (c *UserUseCase) GetUserAndAddress(ctx context.Context, id string) (*model.UserWithAddressResponse, error) {
 	tx := c.DB.WithContext(ctx).Begin()
 	defer tx.Rollback()

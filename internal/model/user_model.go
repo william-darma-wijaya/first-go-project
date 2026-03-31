@@ -33,6 +33,14 @@ type UserLogoutResponse struct {
 	Message string `json:"message"`
 }
 
+type RefreshTokenRequest struct {
+	RefreshToken string `json:"refresh_token"`
+}
+type RefreshTokenResponse struct {
+	Token        string `json:"token"`
+	RefreshToken string `json:"refresh_token"`
+}
+
 type GetUserRequest struct {
 	ID string `params:"id" validate:"required"`
 }
